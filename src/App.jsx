@@ -12,10 +12,17 @@ function App() {
   const [searchText, setSearchText] = useState("");
   const [sortField, setSortField] = useState("Brand Name");
   const [sortDir, setSortDir] = useState("asc"); // 'asc' or 'desc'
+  const [showTop, setShowTop] = useState(false);
 
   useEffect(() => {
     // Load mock data from JSON file. Replace with fetch from API later.
     setLiquors(liquorsData);
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 300);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   // derive unique brands and units for dropdowns
@@ -76,6 +83,30 @@ function App() {
   }
 
   const visible = sortList(filtered);
+
+  // Mobile-only sort select handler
+  function onMobileSortChange(val) {
+    switch (val) {
+      case "price-asc":
+        setSortField("RSP");
+        setSortDir("asc");
+        break;
+      case "price-desc":
+        setSortField("RSP");
+        setSortDir("desc");
+        break;
+      case "label":
+        setSortField("Label Name");
+        setSortDir("asc");
+        break;
+      case "unit":
+        setSortField("Unit Name");
+        setSortDir("asc");
+        break;
+      default:
+        break;
+    }
+  }
 
   return (
     <div className="container">
@@ -150,6 +181,20 @@ function App() {
 
         <div className="result-count">
           Showing <strong>{filtered.length}</strong> of <strong>{liquors.length}</strong>
+        </div>
+        <div className="mobile-sort">
+          <select
+            onChange={(e) => onMobileSortChange(e.target.value)}
+            value={
+              sortField === "RSP" ? (sortDir === "asc" ? "price-asc" : "price-desc") : sortField === "Label Name" ? "label" : sortField === "Unit Name" ? "unit" : ""
+            }
+          >
+            <option value="">Sort</option>
+            <option value="price-asc">Price: low to high</option>
+            <option value="price-desc">Price: high to low</option>
+            <option value="label">Name (label)</option>
+            <option value="unit">Unit</option>
+          </select>
         </div>
       </div>
 
@@ -238,14 +283,29 @@ function App() {
       <div className="card-list">
         {visible.map((liq, idx) => (
           <div key={idx} className="card">
-            <p><strong>Liqour Type:</strong> {liq["Liqour Type"]}</p>
-            <p><strong>Brand Name:</strong> {liq["Brand Name"]}</p>
-            <p><strong>Label Name:</strong> {liq["Label Name"]}</p>
-            <p><strong>Unit Name:</strong> {liq["Unit Name"]}</p>
-            <p><strong>RSP:</strong> {liq["RSP"]}</p>
+            <div className="card-head">
+              <div className="card-brand">{liq["Brand Name"]}</div>
+              <div className="card-price">₹{liq["RSP"]}</div>
+            </div>
+            <div className="card-body">
+              <div className="card-label">{liq["Label Name"]}</div>
+              <div className="card-meta">
+                <span className="meta-item">{liq["Liqour Type"]}</span>
+                <span className="meta-item">{liq["Unit Name"]}</span>
+              </div>
+            </div>
           </div>
         ))}
       </div>
+      {showTop && (
+        <button
+          className="scroll-top"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          aria-label="Scroll to top"
+        >
+          ↑
+        </button>
+      )}
     </div>
   );
 }
