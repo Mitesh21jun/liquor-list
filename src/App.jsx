@@ -16,7 +16,6 @@ function App() {
   useEffect(() => {
     // Load mock data from JSON file. Replace with fetch from API later.
     setLiquors(liquorsData);
-    console.log("Liquors data loaded:", liquorsData.length);    
   }, []);
 
   // derive unique brands and units for dropdowns
@@ -93,7 +92,7 @@ function App() {
         />
 
         <label>
-          Brand:
+          Type:
           <select value={filterBrand} onChange={(e) => setFilterBrand(e.target.value)}>
             <option value="">All</option>
             {brands.map((b) => (
@@ -105,7 +104,7 @@ function App() {
         </label>
 
         <label>
-          Unit:
+          Unit(ML):
           <select value={filterUnit} onChange={(e) => setFilterUnit(e.target.value)}>
             <option value="">All</option>
             {units.map((u) => (
@@ -117,7 +116,7 @@ function App() {
         </label>
 
         <label>
-          RSP under:
+          Max Price:
           <input
             type="number"
             placeholder="max"
@@ -127,7 +126,7 @@ function App() {
         </label>
 
         <label>
-          RSP over:
+          Min Price:
           <input
             type="number"
             placeholder="min"
